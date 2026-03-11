@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", sans-serif; }
+        body {
+            background-image: url('登录背景.jpg'); /* 可替换壁纸 */
+            background-size: cover; background-position: center; background-attachment: fixed;
+            position: relative; min-height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
+        /* 弱化遮罩，突出透视效果 */
+        body::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.15); z-index: 0; }
+        
+        /* 核心：登录框透视/毛玻璃样式 */
+        .login-container {
+            /* 透视关键1：半透明背景（不能全白） */
+            background: rgba(255,255,255,0.2);
+            /* 透视关键2：模糊效果（数值越大越模糊） */
+            backdrop-filter: blur(15px);
+            /* 透视关键3：加轻微边框，增强玻璃质感 */
+            border: 1px solid rgba(255,255,255,0.3);
+            /* 保留原有样式，调整阴影更柔和 */
+            padding: 40px; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            width: 100%; max-width: 400px; position: relative; z-index: 1; text-align: center;
+        }
+        .login-title { color: #fff; font-size: 28px; margin-bottom: 30px; font-weight: bold; text-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; color: #fff; margin-bottom: 8px; font-size: 14px; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .form-group input {
+            width: 100%; padding: 12px 15px; 
+            /* 输入框也加轻微透视 */
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px; font-size: 14px;
+            color: #fff; /* 输入文字白色，更适配透视 */
+            transition: all 0.3s;
+        }
+        /* 输入框聚焦时增强质感 */
+        .form-group input:focus { 
+            outline: none; 
+            border-color: rgba(255,255,255,0.8); 
+            background: rgba(255,255,255,0.2);
+        }
+        /* 输入框提示文字颜色 */
+        .form-group input::placeholder { color: rgba(255,255,255,0.7); }
+        .error-tip { color: #ffeeee; font-size: 12px; margin-top: 5px; display: none; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .login-btn {
+    width: 100%;
+    padding: 12px;
+    /* 核心：按钮主色（柔和粉色，和背景渐变匹配） */
+    background: #f56f7c;
+    /* 文字白色，清晰不刺眼 */
+    color: #ffffff;
+    /* 去掉边框，更干净 */
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    /* 平滑过渡动画 */
+    transition: background 0.3s ease;
+}
+
+/* 鼠标悬浮时：颜色稍深，增强交互反馈 */
+.login-btn:hover {
+    background: #ff8595;
+}
+
+/* 按钮禁用时（比如没输密码）：浅灰粉色，保持风格统一 */
+.login-btn:disabled {
+    background: #f0d6db;
+    color: #c9a8af;
+    cursor: not-allowed;
+}
+        .hint { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 15px; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2 class="login-title">登录</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="password">专属密码</label>
+                <input type="password" id="password" placeholder="管理员请输入密码，访客直接登录">
+                <div class="error-tip" id="pwdError">密码错误啦 ❌</div>
+            </div>
+            <button type="submit" class="login-btn">立即登录</button>
+            <div class="hint">提示：管理员密码是纪念日后六位~</div>
+        </form>
+    </div>
+
+    <script>
+        // 管理员密码
+        const ADMIN_PASSWORD = '220511'; 
+        const loginForm = document.getElementById('loginForm');
+        const passwordInput = document.getElementById('password');
+        const pwdError = document.getElementById('pwdError');
+
+        // 清除旧的登录状态
+        sessionStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('role');
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            pwdError.style.display = 'none';
+
+            const pwd = passwordInput.value.trim();
+            
+            // 逻辑：
+            // 1. 输入 220511 -> 管理员 (admin)
+            // 2. 不输入密码 -> 观察者 (guest)
+            // 3. 输入其他密码 -> 报错
+
+            if (pwd === ADMIN_PASSWORD) {
+                // 管理员登录
+                sessionStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('role', 'admin');
+                window.location.replace('index.html');
+            } else if (pwd === '') {
+                // 观察者登录
+                sessionStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('role', 'guest');
+                window.location.replace('index.html');
+            } else {
+                // 密码错误
+                pwdError.style.display = 'block';
+                passwordInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
