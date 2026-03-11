@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 替换原有viewport标签，手机端核心适配 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>我们的小窝 - 说说</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            min-height: 100vh;
+        }
+         
+        .sidebar {
+            width: 100px;
+            background-color: #ffffff;
+            border-right: 1px solid #f0f0f0;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .sidebar .logo {
+            width: 30px;
+            height: 30px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar .nav-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sidebar .nav-item.active {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+        .sidebar .nav-item:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 100px;
+            right: 0;
+            height: 60px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 10;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            width: 300px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .menu-btn {
+            margin-left: auto;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .menu-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 100px;
+            margin-top: 60px;
+            padding: 40px;
+            max-width: 900px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: #999999;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .publish-card {
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .publish-card textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+            resize: none;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .upload-area {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .upload-btn:hover {
+            background-color: #eaeaea;
+        }
+
+        .upload-btn input {
+            display: none;
+        }
+
+        .preview-area {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f5f5f5;
+        }
+
+        .preview-item {
+            width: 100px;
+            height: 100px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            background-color: #eaeaea;
+        }
+
+        .preview-item img, .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-item .file-label {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            padding: 5px;
+            word-break: break-all;
+            color: #666;
+        }
+
+        .preview-item .video-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 12px;
+        }
+
+        .preview-item .close-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(0,0,0,0.6);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .publish-btn {
+            padding: 6px 16px;
+            background-color: #333333;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .publish-btn:hover {
+            background-color: #555555;
+        }
+
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .post-item {
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 8px;
+        }
+
+        .post-content {
+            color: #333333;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .post-attachments {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .post-attachment {
+            width: 180px;
+            height: 180px;
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: #f5f5f5;
+        }
+
+        .post-attachment img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-attachment video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            outline: none;
+        }
+
+        .post-attachment .file-label {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            padding: 10px;
+            word-break: break-all;
+            color: #666;
+            border: 1px dashed #ddd;
+        }
+
+        .post-meta {
+            color: #999999;
+            font-size: 13px;
+        }
+
+        .aside {
+            width: 300px;
+            padding: 40px 20px;
+            border-left: 1px solid #f0f0f0;
+            margin-top: 60px;
+        }
+
+        .profile-card {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatars {
+            display: flex;
+            justify-content: center;
+            gap: -15px;
+            margin-bottom: 15px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            overflow: hidden;
+            border: 3px solid #ffffff;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-bio {
+            color: #999999;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .stat-label {
+            color: #999999;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .social-card {
+            margin-bottom: 30px;
+        }
+
+        .social-title {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 10px;
+        }
+
+        .social-item {
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .copyright {
+            color: #999999;
+            font-size: 12px;
+            text-align: center;
+        }
+        /* ====== 新增：手机端响应式适配 (屏幕宽度≤768px) ====== */
+@media (max-width: 768px) {
+  /* 1. 页面整体：去掉padding，适配手机 */
+  body {
+    padding: 10px 0;
+  }
+
+  /* 2. 发布框：宽度100%，去掉固定最大宽度，手机端全屏 */
+  .publish-box {
+    max-width: 100%;
+    padding: 15px 10px;
+    margin: 0 10px 20px;
+  }
+  /* 保存路径输入框：手机端宽度100% */
+  .publish-box .path-input input {
+    width: 100%;
+  }
+  /* 上传区域：手机端竖向排列，更友好 */
+  .publish-box .upload-area {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .publish-box .upload-area input {
+    padding: 8px;
+  }
+  /* 预览图片/视频：手机端缩小，适配屏幕 */
+  .preview-area img, .preview-area video {
+    max-width: 100%;
+  }
+
+  /* 3. 说说列表：手机端适配，间距缩小 */
+  .say-list {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+  .say-item {
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  /* 4. 右上角菜单按钮：手机端点击区域变大，位置调整 */
+  #menuBtn {
+    width: 44px;
+    height: 44px;
+    top: 8px;
+    right: 8px;
+    z-index: 9999;
+  }
+  /* 菜单下拉框：手机端宽度80%，居中 */
+  #menuBox {
+    width: 80%;
+    right: 10%;
+  }
+
+  /* 5. 所有弹窗：手机端宽度90% */
+  #pwdModal > div, #reportModal > div, #memoModal > div {
+    width: 90%;
+    padding: 15px;
+  }
+  #memoModal > div {
+    max-height: 70%;
+  }
+}
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">🐟</div>
+        <div class="nav-item" data-page="home">🏠</div>
+        <div class="nav-item active" data-page="say">💬</div>
+        <div class="nav-item">📁</div>
+        <div class="nav-item">#</div>
+        <div class="nav-item">🔖</div>
+        <div class="nav-item">📖</div>
+        <div class="nav-item">📊</div>
+    </div>
+
+    <div class="top-bar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="搜索说说内容或日期...">
+        </div>
+        <div class="menu-btn">☰</div>
+    </div>
+
+    <div class="main-content">
+        <h1 class="page-title">说说</h1>
+        <p class="page-subtitle">Say.</p>
+
+        <div class="publish-card">
+            <textarea id="sayContent" placeholder="分享此刻的心情..."></textarea>
+            
+            <div class="upload-area">
+                <label class="upload-btn">
+                    📷 上传图片
+                    <input type="file" id="imageUpload" accept="image/*" multiple>
+                </label>
+                <label class="upload-btn">
+                    📎 上传文件
+                    <input type="file" id="fileUpload" multiple>
+                </label>
+                <label class="upload-btn">
+                    📹 上传视频
+                    <input type="file" id="videoUpload" accept="video/*" multiple>
+                </label>
+            </div>
+
+            <div class="preview-area" id="previewArea"></div>
+
+            <button class="publish-btn" id="publishBtn">发布说说</button>
+        </div>
+
+        <div class="post-list" id="sayList">
+            <div style="text-align: center; color: #999; padding: 40px 0;">还没有说说，快来发布第一条吧～</div>
+        </div>
+    </div>
+
+    <div class="aside">
+        <div class="profile-card">
+            <div class="profile-avatars">
+                <div class="profile-avatar">
+                    <img src="img\男生头像.jpg" alt="头像1">
+                </div>
+                <div class="profile-avatar">
+                    <img src="img\女生头像.jpg" alt="头像2">
+                </div>
+            </div>
+            <div class="profile-name">说说</div>
+            <div class="profile-bio">我们的恋爱纪念册</div>
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="recordCount">0</div>
+                    <div class="stat-label">说说</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="albumCount">0</div>
+                    <div class="stat-label">照片</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="loveDays">0</div>
+                    <div class="stat-label">相恋天</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="social-card">
+            <div class="social-title">记录 Social.</div>
+            <div class="social-item">📺</div>
+        </div>
+
+        <div class="copyright">
+            Copyright © 2024 - 2026 我们的小窝
+        </div>
+    </div>
+
+    <script>
+        const LOVE_START_DATE = new Date(2022, 4, 11);
+        let uploadedFiles = [];
+
+        const imageUpload = document.getElementById('imageUpload');
+        const fileUpload = document.getElementById('fileUpload');
+        const videoUpload = document.getElementById('videoUpload');
+        const previewArea = document.getElementById('previewArea');
+
+        imageUpload.addEventListener('change', (e) => handleFileUpload(e.target.files, 'image'));
+        fileUpload.addEventListener('change', (e) => handleFileUpload(e.target.files, 'file'));
+        videoUpload.addEventListener('change', (e) => handleFileUpload(e.target.files, 'video'));
+
+        function handleFileUpload(files, type) {
+            if (!files.length) return;
+
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const fileInfo = {
+                        id: Date.now() + Math.random(),
+                        name: file.name,
+                        type: type,
+                        data: event.target.result
+                    };
+                    uploadedFiles.push(fileInfo);
+                    renderPreviewItem(fileInfo);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            imageUpload.value = '';
+            fileUpload.value = '';
+            videoUpload.value = '';
+        }
+
+        function renderPreviewItem(fileInfo) {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            previewItem.dataset.id = fileInfo.id;
+
+            if (fileInfo.type === 'image') {
+                previewItem.innerHTML = `
+                    <img src="${fileInfo.data}" alt="${fileInfo.name}">
+                    <span class="close-btn">×</span>
+                `;
+            } else if (fileInfo.type === 'file') {
+                previewItem.innerHTML = `
+                    <div class="file-label">${fileInfo.name}</div>
+                    <span class="close-btn">×</span>
+                `;
+            } else if (fileInfo.type === 'video') {
+                previewItem.innerHTML = `
+                    <video src="${fileInfo.data}" preload="metadata"></video>
+                    <span class="video-label">视频</span>
+                    <span class="close-btn">×</span>
+                `;
+            }
+
+            previewItem.querySelector('.close-btn').addEventListener('click', () => {
+                uploadedFiles = uploadedFiles.filter(item => item.id !== fileInfo.id);
+                previewItem.remove();
+            });
+
+            previewArea.appendChild(previewItem);
+        }
+
+        const publishBtn = document.getElementById('publishBtn');
+        const sayContent = document.getElementById('sayContent');
+        const sayList = document.getElementById('sayList');
+        const recordCount = document.getElementById('recordCount');
+        const searchInput = document.getElementById('searchInput');
+
+        function getSays() {
+            const says = localStorage.getItem('loveSays');
+            return says ? JSON.parse(says) : [];
+        }
+
+        function renderSays(filter = '') {
+            const says = getSays();
+            recordCount.textContent = says.length;
+
+            let filteredSays = says;
+            if (filter) {
+                filteredSays = says.filter(say => 
+                    say.content.includes(filter) || say.time.includes(filter)
+                );
+            }
+
+            if (filteredSays.length === 0) {
+                sayList.innerHTML = '<div style="text-align: center; color: #999; padding: 40px 0;">没有找到相关内容～</div>';
+                return;
+            }
+
+            sayList.innerHTML = filteredSays.reverse().map(say => `
+                <div class="post-item">
+                    <div class="post-content">${say.content}</div>
+                    ${say.attachments && say.attachments.length > 0 ? `
+                    <div class="post-attachments">
+                        ${say.attachments.map(att => {
+                            if(att.type === 'image'){
+                                return `<div class="post-attachment"><img src="${att.data}" alt="${att.name}"></div>`;
+                            }else if(att.type === 'video'){
+                                return `<div class="post-attachment"><video src="${att.data}" controls></video></div>`;
+                            }else{
+                                return `<div class="post-attachment"><div class="file-label">${att.name}</div></div>`;
+                            }
+                        }).join('')}
+                    </div>
+                    ` : ''}
+                    <div class="post-meta">${say.time}</div>
+                </div>
+            `).join('');
+        }
+
+        publishBtn.addEventListener('click', function() {
+            const content = sayContent.value.trim();
+            if (!content && uploadedFiles.length === 0) {
+                alert('请输入内容或上传附件！');
+                return;
+            }
+
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            const newSay = {
+                time: timeStr,
+                content: content,
+                attachments: [...uploadedFiles]
+            };
+
+            const says = getSays();
+            says.push(newSay);
+            localStorage.setItem('loveSays', JSON.stringify(says));
+
+            sayContent.value = '';
+            uploadedFiles = [];
+            previewArea.innerHTML = '';
+            renderSays();
+        });
+
+        searchInput.addEventListener('input', function() {
+            renderSays(this.value.trim());
+        });
+
+        function updateLoveDays() {
+            const now = new Date();
+            const diff = now - LOVE_START_DATE;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('loveDays').textContent = days;
+        }
+
+        function updateAlbumCount() {
+            const albums = localStorage.getItem('loveAlbums');
+            const count = albums ? JSON.parse(albums).length : 0;
+            document.getElementById('albumCount').textContent = count;
+        }
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const page = this.dataset.page;
+                if (page === 'home') {
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+
+        window.onload = function() {
+            renderSays();
+            updateLoveDays();
+            updateAlbumCount();
+        };
+    </script>
+</body>
+</html>
