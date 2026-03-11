@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我们的小窝 - 首页</title>
+    <style>
+        /* 全局重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            min-height: 100vh;
+            padding-bottom: 0;
+        }
+
+        /* 左侧导航栏（PC端样式） */
+        .sidebar {
+            width: 100px;
+            background-color: #ffffff;
+            border-right: 1px solid #f0f0f0;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            position: fixed;
+            height: 100vh;
+            z-index: 99;
+        }
+
+        .sidebar .logo {
+            width: 30px;
+            height: 30px;
+            /* background-color: #f5f5f5; */
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sidebar .nav-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 20px;
+        }
+
+        .sidebar .nav-item.active {
+            background-color: #f56f7c; /* 用户要求的适合颜色 */
+            color: #ffffff;
+        }
+
+        .sidebar .nav-item:hover:not(.active) {
+            background-color: #fff0f2;
+        }
+
+        /* 顶部栏（包含搜索框） */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 100px;
+            right: 0;
+            height: 60px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 10;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            width: 300px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .menu-btn {
+            margin-left: auto;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .menu-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            margin-left: 100px;
+            margin-top: 60px;
+            padding: 40px;
+            max-width: 900px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: #999999;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* 标签栏修改：新增关于我们、替换说说为记录 */
+        .tags {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .tag.active {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+        .tag:hover:not(.active) {
+            background-color: #eaeaea;
+        }
+
+        /* 日记本样式（关于我们下方显示） */
+        .diary-box {
+            width: 100%;
+            padding: 30px 20px;
+            background-color: #fdf9f3;
+            border: 1px solid #f0e6d6;
+            border-radius: 8px;
+            line-height: 1.8;
+            font-size: 16px;
+            color: #664f33;
+            margin-bottom: 30px;
+            display: none; /* 默认隐藏 */
+        }
+
+        /* 文章列表 */
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .post-item {
+            display: flex;
+            gap: 20px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .post-cover {
+            width: 240px;
+            height: 160px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .post-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .post-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333333;
+        }
+
+        .post-desc {
+            color: #666666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .post-meta {
+            color: #999999;
+            font-size: 13px;
+        }
+
+        .post-more {
+            align-self: flex-start;
+            color: #999999;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .post-more:hover {
+            color: #333333;
+        }
+
+        /* 右侧个人栏 */
+        .aside {
+            width: 300px;
+            padding: 40px 20px;
+            border-left: 1px solid #f0f0f0;
+            margin-top: 60px;
+        }
+
+        .profile-card {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatars {
+            display: flex;
+            justify-content: center;
+            gap: -15px;
+            margin-bottom: 15px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            overflow: hidden;
+            border: 3px solid #ffffff;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-bio {
+            color: #999999;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .stat-label {
+            color: #999999;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .social-card {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .social-title {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 10px;
+        }
+
+        .social-item {
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .copyright {
+            color: #999999;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* 发布说说卡片（说说页面专用） */
+        .publish-card {
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .publish-card textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+            resize: none;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .publish-btn {
+            padding: 6px 16px;
+            background-color: #333333;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .publish-btn:hover {
+            background-color: #555555;
+        }
+
+        /* 移动端响应式样式（完全保留你原有效果：全屏个人栏+壁纸+头像居中） */
+        @media (max-width: 768px) {
+            body {
+                display: flex;
+                flex-direction: column;
+                padding-bottom: 80px;
+            }
+            .aside {
+                order: 1;
+                width: 100%;
+                height: 100vh;
+                border-left: none;
+                border-bottom: none;
+                padding: 20px 10px;
+                margin-top: 0;
+                position: relative;
+                top: 0;
+                right: auto;
+                background-image: url('登录背景.jpg');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-color: #f5f5f5;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+            .profile-card {
+                width: 100%;
+                margin: auto;
+            }
+            .profile-avatars {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 0 auto 15px;
+                gap: 5px;
+                width: 100%;
+            }
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                flex-shrink: 0;
+            }
+            .profile-name {
+                font-size: 22px;
+                font-weight: 600;
+                margin-bottom: 8px;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+                color: white;
+            }
+            .profile-bio {
+                color: rgba(255,255,255,0.8);
+                font-size: 14px;
+                margin-bottom: 20px;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            }
+            .profile-stats {
+                justify-content: center;
+                gap: 30px;
+                border-top: none;
+                border-bottom: none;
+            }
+            .stat-number {
+                font-size: 22px;
+                color: white;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            }
+            .stat-label {
+                color: rgba(255,255,255,0.7);
+                font-size: 14px;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            }
+            .social-card, .copyright {
+                display: none;
+            }
+            .top-bar {
+                order: 2;
+                position: relative;
+                top: auto;
+                left: 0;
+                width: 100%;
+                padding: 10px 20px;
+                display: flex;
+                justify-content: center;
+                height: auto;
+                background-color: #ffffff;
+                border-top: 1px solid #f0f0f0;
+            }
+            .search-box {
+                width: 90%;
+                max-width: 400px;
+            }
+            .menu-btn {
+                display: none;
+            }
+            .main-content {
+                order: 3;
+                margin-left: 0;
+                margin-top: 0;
+                padding: 20px;
+                max-width: 100%;
+            }
+            .sidebar {
+                order: 4;
+                width: 100%;
+                height: auto;
+                padding: 15px 0;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                top: auto;
+                border-right: none;
+                border-top: 1px solid #f0f0f0;
+                gap: 0;
+                background-color: #ffffff;
+            }
+            .sidebar .logo {
+                display: none;
+            }
+            /* 移动端日记本样式适配 */
+            .diary-box {
+                padding: 20px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左侧/底部导航栏 -->
+    <div class="sidebar">
+        <div class="logo">❤️</div>
+        <div class="nav-item active" data-page="home">🏠</div>
+        <div class="nav-item" data-page="say">💬</div>
+        <div class="nav-item" data-page="record">📖</div>
+        <div class="nav-item" data-page="album">�️</div>
+        <div class="nav-item">📊</div>
+    </div>
+
+    <!-- 顶部搜索栏（原有不变） -->
+    <div class="top-bar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="搜索说说内容或日期...">
+        </div>
+        <div class="menu-btn" id="loginBtn">☰</div>
+    </div>
+
+    <!-- 中间主内容区（核心修改：标签栏+日记本） -->
+    <div class="main-content">
+        <div id="homePage">
+            <h1 class="page-title">首页</h1>
+            <p class="page-subtitle">Home.</p>
+            <!-- 标签栏修改：关于我们 + 最新发布 + 记录 -->
+            <div class="tags">
+                <div class="tag active" id="tag-about">关于我们</div>
+                <div class="tag" id="tag-new">最新发布</div>
+                <div class="tag" id="tag-record">记录</div>
+            </div>
+
+            <!-- 关于我们 - 日记本内容（可直接修改文字，背景为日记本样式） -->
+            <div class="diary-box" id="diaryContent" style="display: block;">
+                这是我们的恋爱日记本，藏着属于我们的点点滴滴～<br>
+                从相遇的第一眼，到相伴的朝朝暮暮，每一个瞬间都值得被珍藏。<br>
+                愿我们的爱意，在时光里慢慢沉淀，岁岁年年，永不褪色。<br>
+                往后余生，三餐四季，岁岁年年，皆与你共度。
+            </div>
+
+            <!-- 最新发布 - 原有说说列表（不变） -->
+            <div class="post-list" id="recordList" style="display: none;">
+                <div style="text-align: center; color: #999; padding: 40px 0;">还没有回忆，快来记录第一条吧～</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧/全屏个人栏（原有不变，壁纸/头像/恋爱天数都在） -->
+    <div class="aside">
+        <div class="profile-card">
+            <div class="profile-avatars">
+                <div class="profile-avatar">
+                    <img src="img/男生头像.jpg" alt="男生头像">
+                </div>
+                <div class="profile-avatar">
+                    <img src="img/女生头像.jpg" alt="女生头像">
+                </div>
+            </div>
+            <div class="profile-name">主页</div>
+            <div class="profile-bio">欢迎收看我们的恋爱频道 ♡̷</div>
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="recordCount">0</div>
+                    <div class="stat-label">点滴</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="albumCount">0</div>
+                    <div class="stat-label">照片</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="loveDays">0</div>
+                    <div class="stat-label">相恋天</div>
+                </div>
+                
+            </div>
+        </div><div class="social-card">
+            <div class="social-title">主页 Homepage</div>
+            <div class="social-item">🌹</div>
+        </div>
+        
+        <div class="copyright">
+            Copyright © 2024 - 2026 我们的小窝
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
+    <script src="js/cos-utils.js"></script>
+    <script>
+        // 核心配置（原有不变，修改恋爱日期在这里）
+        const LOVE_START_DATE = new Date(2022, 4, 11);
+        const recordList = document.getElementById('recordList');
+        const recordCount = document.getElementById('recordCount');
+        const searchInput = document.getElementById('searchInput');
+
+        // 新增：标签栏切换逻辑（关于我们/最新发布/记录）
+        const tagAbout = document.getElementById('tag-about');
+        const tagNew = document.getElementById('tag-new');
+        const tagRecord = document.getElementById('tag-record');
+        const diaryContent = document.getElementById('diaryContent');
+        const loginBtn = document.getElementById('loginBtn');
+
+        // 检查权限并初始化
+        function checkPermission() {
+            const role = localStorage.getItem('role');
+            if (role === 'admin') {
+                diaryContent.contentEditable = 'true';
+                diaryContent.style.cursor = 'text';
+                loginBtn.style.color = '#333'; // 登录状态深色显示
+                
+                // 监听输入，保存关于我们内容
+                diaryContent.addEventListener('input', () => {
+                    localStorage.setItem('aboutContent', diaryContent.innerHTML);
+                });
+            } else {
+                diaryContent.contentEditable = 'false';
+                diaryContent.style.cursor = 'default';
+                loginBtn.style.color = '#ccc'; // 未登录状态浅色显示
+            }
+        }
+
+        // 加载保存的关于我们内容
+        async function loadAbout() {
+            const data = await API.getData('about.json', { content: '' });
+            if (data.content) {
+                diaryContent.innerHTML = data.content;
+            }
+        }
+
+        // 登录/注销逻辑
+        loginBtn.addEventListener('click', () => {
+            const currentRole = localStorage.getItem('role');
+            if (currentRole === 'admin') {
+                if (confirm('确定要退出管理员模式吗？')) {
+                    localStorage.removeItem('role');
+                    location.reload();
+                }
+            } else {
+                const password = prompt('请输入管理员密码：');
+                if (password === '220511') { // 假设密码为220511
+                    localStorage.setItem('role', 'admin');
+                    alert('管理员登录成功！');
+                    location.reload();
+                } else if (password) {
+                    alert('密码错误');
+                }
+            }
+        });
+
+        // 记录标签点击跳转record.html
+        tagRecord.addEventListener('click', () => {
+            window.location.href = 'record.html';
+        });
+        // 关于我们标签：显示日记本，隐藏说说列表
+        tagAbout.addEventListener('click', () => {
+            tagAbout.classList.add('active');
+            tagNew.classList.remove('active');
+            diaryContent.style.display = 'block';
+            recordList.style.display = 'none';
+        });
+        // 最新发布标签：显示说说列表，隐藏日记本
+        tagNew.addEventListener('click', () => {
+            tagNew.classList.add('active');
+            tagAbout.classList.remove('active');
+            diaryContent.style.display = 'none';
+            recordList.style.display = 'flex';
+        });
+
+        // 原有功能：说说获取/渲染/搜索（不变）
+        async function getRecords() {
+            // 从 COS 获取说说列表
+            return await API.getData('says.json', []);
+        }
+        async function renderRecords(filter = '') {
+            const records = await getRecords();
+            recordCount.textContent = records.length;
+            let filteredRecords = records;
+            if (filter) {
+                filteredRecords = records.filter(record =>
+                    record.content.includes(filter) || record.time.includes(filter)
+                );
+            }
+            if (filteredRecords.length === 0) {
+                recordList.innerHTML = '<div style="text-align: center; color: #999; padding: 40px 0;">还没有说说，快来发布吧～</div>';
+                return;
+            }
+            recordList.innerHTML = filteredRecords.reverse().map(record => {
+                let attachmentHtml = '';
+                if (record.attachments && record.attachments.length > 0) {
+                    attachmentHtml = `
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0;">
+                            ${record.attachments.map(att => {
+                                if (att.type === 'image') {
+                                    return `<img src="${att.data}" alt="${att.name}" style="width: 120px; height: 120px; border-radius: 4px; object-fit: cover;">`;
+                                } else if (att.type === 'video') {
+                                    return `<video src="${att.data}" controls style="width: 120px; height: 120px; border-radius: 4px; object-fit: cover;"></video>`;
+                                } else {
+                                    return `<div style="width: 120px; height: 120px; border-radius: 4px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666; padding: 5px; word-break: break-all;">${att.name}</div>`;
+                                }
+                            }).join('')}
+                        </div>
+                    `;
+                }
+                return `
+                    <div style="padding: 25px 0; border-bottom: 1px solid #f0f0f0;">
+                        <div style="font-size: 18px; font-weight: 500; margin-bottom: 10px;">我们的说说</div>
+                        <div style="color: #333; font-size: 14px; line-height: 1.6; margin-bottom: 8px;">${record.content}</div>
+                        ${attachmentHtml}
+                        <div style="color: #999; font-size: 12px;">${record.time}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        searchInput.addEventListener('input', function () {
+            renderRecords(this.value.trim());
+        });
+
+        // 原有功能：恋爱天数/相册数量（不变）
+        function updateLoveDays() {
+            const now = new Date();
+            const diff = now - LOVE_START_DATE;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('loveDays').textContent = days;
+        }
+        async function updateAlbumCount() {
+            const albums = await API.getData('albums.json', []);
+            document.getElementById('albumCount').textContent = albums.length;
+        }
+
+        // 导航跳转逻辑
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const page = this.dataset.page;
+                if (page === 'say') {
+                    window.location.href = 'say.html';
+                } else if (page === 'record') {
+                    window.location.href = 'record.html';
+                } else if (page === 'album') {
+                    window.location.href = 'album.html';
+                }
+            });
+        });
+
+        // 初始化（不变）
+        window.onload = function () {
+            // 检查是否登录
+            if (!localStorage.getItem('isLoggedIn')) {
+                window.location.replace('login.html');
+                return;
+            }
+
+            // 加载所有数据
+            loadAbout();
+            renderRecords();
+            updateLoveDays();
+            updateAlbumCount();
+            
+            // 检查权限并初始化
+            checkPermission();
+        };
+    </script>
+</body>
+</html>
