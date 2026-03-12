@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恋爱相册 - 我们的小窝</title>
+    <style>
+        /* 全局重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            min-height: 100vh;
+            padding-bottom: 0;
+        }
+
+        /* 左侧导航栏（PC端样式） */
+        .sidebar {
+            width: 100px;
+            background-color: #ffffff;
+            border-right: 1px solid #f0f0f0;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            position: fixed;
+            height: 100vh;
+            z-index: 99;
+        }
+
+        .sidebar .logo {
+            width: 30px;
+            height: 30px;
+            /* background-color: #f5f5f5; */
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sidebar .nav-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 20px;
+        }
+
+        .sidebar .nav-item.active {
+            background-color: #f56f7c; /* 用户要求的适合颜色 */
+            color: #ffffff;
+        }
+
+        .sidebar .nav-item:hover:not(.active) {
+            background-color: #fff0f2;
+        }
+
+        /* 顶部栏（包含搜索框） */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 100px;
+            right: 0;
+            height: 60px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 10;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            width: 300px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .menu-btn {
+            margin-left: auto;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .menu-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* 主内容区（无个人栏） */
+        .main-content {
+            flex: 1;
+            margin-left: 100px;
+            margin-top: 60px;
+            padding: 40px;
+            /* max-width: 900px;  相册页全宽 */
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .page-subtitle {
+            color: #999999;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* 相册网格 */
+        .album-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .album-item {
+            position: relative;
+            aspect-ratio: 1;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .album-item:hover {
+            transform: scale(1.02);
+        }
+
+        .album-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .album-upload {
+            border: 2px dashed #e0e0e0;
+            background-color: #fafafa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .album-upload:hover {
+            border-color: #f56f7c;
+            color: #f56f7c;
+            background-color: #fff0f2;
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+        }
+
+        /* 移动端响应式 */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                padding-bottom: 80px;
+            }
+
+            .top-bar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 10px 20px;
+                height: auto;
+                z-index: 90;
+            }
+
+            .search-box {
+                width: 100%;
+                max-width: none;
+            }
+
+            .menu-btn {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                margin-top: 60px;
+                padding: 20px;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 15px 0;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                top: auto;
+                border-right: none;
+                border-top: 1px solid #f0f0f0;
+                gap: 0;
+                background-color: #ffffff;
+                z-index: 99;
+            }
+
+            .sidebar .logo {
+                display: none;
+            }
+            
+            .album-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左侧/底部导航栏 -->
+    <div class="sidebar">
+        <div class="logo">❤️</div>
+        <div class="nav-item" data-page="home">🏠</div>
+        <div class="nav-item" data-page="say">💬</div>
+        <div class="nav-item" data-page="record">📖</div>
+        <div class="nav-item active" data-page="album">🖼️</div>
+        <div class="nav-item">📊</div>
+    </div>
+
+    <!-- 顶部搜索栏 -->
+    <div class="top-bar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="搜索相册...">
+        </div>
+        <div class="menu-btn">☰</div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <h1 class="page-title">恋爱相册</h1>
+        <p class="page-subtitle">定格我们的美好瞬间。</p>
+
+        <div class="album-grid" id="albumGrid">
+            <!-- 上传按钮 -->
+            <div class="album-item album-upload" id="uploadBtn">
+                <div class="upload-icon">➕</div>
+                <div class="upload-text">上传照片</div>
+                <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+            </div>
+            <!-- 照片列表将在这里渲染 -->
+        </div>
+    </div>
+
+    <!-- 图片预览模态框 -->
+    <div id="imageModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center; flex-direction: column;">
+        <img id="modalImage" src="" style="max-width:90%; max-height:80%; border-radius:4px; margin-bottom: 10px;">
+        <div id="modalCaption" style="color: white; font-size: 16px; text-align: center; max-width: 80%;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
+    <script src="cos-utils.js"></script>
+    <script>
+        // 检查登录（兼容 session 和 local）
+        if (!localStorage.getItem('isLoggedIn') && !sessionStorage.getItem('isLoggedIn')) {
+            window.location.replace('login.html');
+        }
+
+        const albumGrid = document.getElementById('albumGrid');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
+        
+        // 图片预览功能
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const modalCaption = document.getElementById('modalCaption');
+        
+        window.previewImage = function(src, caption) {
+            modalImg.src = src;
+            modalCaption.textContent = caption || '';
+            modalCaption.style.display = caption ? 'block' : 'none';
+            modal.style.display = 'flex';
+        };
+
+        modal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // 获取本地存储的照片
+        async function getAlbums() {
+            return await API.getData('albums.json', []);
+        }
+
+        // 渲染相册
+        async function renderAlbums() {
+            const albums = await getAlbums();
+            // 清除除了上传按钮以外的内容
+            const items = document.querySelectorAll('.album-item:not(.album-upload)');
+            items.forEach(item => item.remove());
+
+            albums.reverse().forEach(item => {
+                // 兼容旧数据（旧数据只是字符串URL）
+                const src = typeof item === 'string' ? item : item.url;
+                const caption = typeof item === 'string' ? '' : item.caption;
+                
+                const div = document.createElement('div');
+                div.className = 'album-item';
+                div.innerHTML = `<img src="${src}" loading="lazy" onclick="previewImage('${src}', '${caption ? caption.replace(/'/g, "\\'") : ''}')">`;
+                
+                // 如果有备注，在缩略图上也显示（可选，根据用户需求"上传图片令加文字备注输入栏绑定与图片一起"）
+                // 用户需求：如无备注则点击图片放大后则不显示备注 -> 已实现
+                // 用户需求：相册点击图片也是放大图片并且有显示备注功能 -> 已实现
+                
+                albumGrid.appendChild(div);
+            });
+        }
+
+        // 上传逻辑
+        uploadBtn.addEventListener('click', () => {
+            const role = localStorage.getItem('role');
+            if (role !== 'admin') {
+                alert('只有管理员可以上传照片哦~');
+                return;
+            }
+            // 触发上传前先询问备注（简单实现绑定）
+            // 或者我们可以修改UI，但用户要求"右上角只有管理员权限才能菜单栏点击后显示上传图片"
+            // 目前UI是卡片式上传。我们可以先让用户选图，选完图后输入备注。
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            // 询问备注（批量上传时，这个备注会应用到所有选中的图片，或者我们可以简化为一张一张传）
+            // 为了简单易用，这里假设用户想给这一批照片加统一备注，或者不加
+            const caption = prompt('请输入照片备注（可选）：');
+
+            // 显示上传中
+            const originalText = document.querySelector('.upload-text').textContent;
+            document.querySelector('.upload-text').textContent = '上传中...';
+
+            const albums = await getAlbums();
+            
+            for (let i = 0; i < files.length; i++) {
+                try {
+                    const url = await API.uploadFile(files[i], 'photos/');
+                    // 保存对象结构：{ url: '...', caption: '...' }
+                    albums.push({ url: url, caption: caption || '' });
+                } catch (err) {
+                    console.error('上传失败', err);
+                }
+            }
+
+            await API.saveData('albums.json', albums);
+            renderAlbums();
+            
+            alert('上传操作完成');
+            document.querySelector('.upload-text').textContent = originalText;
+            fileInput.value = ''; 
+        });
+
+        // 导航跳转
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const page = this.dataset.page;
+                if (page === 'home') window.location.href = 'index.html';
+                else if (page === 'say') window.location.href = 'say.html';
+                else if (page === 'record') window.location.href = 'record.html';
+                else if (page === 'album') window.location.href = 'album.html';
+            });
+        });
+
+        // 初始化
+        renderAlbums();
+    </script>
+</body>
+</html>
