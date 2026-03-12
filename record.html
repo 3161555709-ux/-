@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恋爱100件小事 - 我们的小窝</title>
+    <style>
+        /* 全局重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* PC端基础布局 */
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            min-height: 100vh;
+            padding-bottom: 0;
+        }
+
+        /* 左侧导航栏（PC端样式） */
+        .sidebar {
+            width: 100px;
+            background-color: #ffffff;
+            border-right: 1px solid #f0f0f0;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            position: fixed;
+            height: 100vh;
+            z-index: 99;
+        }
+
+        .sidebar .logo {
+            width: 30px;
+            height: 30px;
+            /* background-color: #f5f5f5; */
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sidebar .nav-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 20px;
+        }
+
+        .sidebar .nav-item.active {
+            background-color: #f56f7c; /* 用户要求的适合颜色 */
+            color: #ffffff;
+        }
+
+        .sidebar .nav-item:hover:not(.active) {
+            background-color: #fff0f2;
+        }
+
+        /* 顶部搜索栏（PC端） */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 100px;
+            right: 0;
+            height: 60px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 10;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            width: 300px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .menu-btn {
+            margin-left: auto;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .menu-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* 主内容区（PC端） */
+        .main-content {
+            flex: 1;
+            margin-left: 100px;
+            margin-top: 60px;
+            padding: 40px;
+            max-width: 900px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        /* 恋爱小事样式：左侧可勾选圆圈 */
+        .love-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .love-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            font-size: 16px;
+            line-height: 1.8;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        /* 可勾选圆圈核心样式 */
+        .check-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            margin-top: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .check-circle.checked {
+            background-color: #333;
+            border-color: #333;
+        }
+
+        .check-circle.checked::after {
+            content: '✓';
+            font-size: 12px;
+        }
+
+        /* 右侧个人栏（仅PC端显示） */
+        .aside {
+            width: 300px;
+            padding: 40px 20px;
+            border-left: 1px solid #f0f0f0;
+            margin-top: 60px;
+        }
+
+        .profile-card {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatars {
+            display: flex;
+            justify-content: center;
+            gap: -15px;
+            margin-bottom: 15px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            overflow: hidden;
+            border: 3px solid #ffffff;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-bio {
+            color: #999999;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .stat-label {
+            color: #999999;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .social-card {
+            margin-bottom: 30px;
+        }
+
+        .social-title {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 10px;
+        }
+
+        .social-item {
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .copyright {
+            color: #999999;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* ========== 移动端响应式（核心：隐藏个人栏，底部导航和主页一致） ========== */
+        @media (max-width: 768px) {
+            /* 整体布局改为垂直列 */
+            body {
+                flex-direction: column;
+                padding-bottom: 80px; /* 给底部导航留空间 */
+            }
+
+            /* 隐藏个人栏 */
+            .aside {
+                display: none !important;
+            }
+
+            /* 顶部搜索栏：置顶，宽度100% */
+            .top-bar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 10px 20px;
+                height: auto;
+                z-index: 90;
+            }
+
+            .search-box {
+                width: 100%;
+                max-width: none;
+            }
+
+        /* 移动端响应式 */
+        @media (max-width: 768px) {
+            /* ... 原有样式 ... */
+            
+            /* 顶部搜索栏适配移动端 */
+            .top-bar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 10px 20px;
+                height: auto;
+                z-index: 90;
+                display: flex;
+                align-items: center;
+                justify-content: space-between; /* 确保标题和菜单按钮两端对齐 */
+            }
+
+            .menu-btn {
+                display: flex !important; /* 强制显示菜单按钮 */
+                margin-left: 0; /* 重置边距 */
+            }
+
+            /* 下拉菜单适配 */
+            .dropdown-menu {
+                right: 10px !important;
+                top: 50px !important;
+                width: 200px !important;
+            }
+        }
+
+            /* 主内容区：置顶展示，无侧边距 */
+            .main-content {
+                margin-left: 0;
+                margin-top: 60px; /* 避开顶部搜索栏 */
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            .page-title {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            .love-item {
+                font-size: 14px;
+            }
+
+            /* 左侧导航改为底部导航（和主页完全一致） */
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 15px 0;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                top: auto;
+                border-right: none;
+                border-top: 1px solid #f0f0f0;
+                gap: 0;
+                background-color: #ffffff;
+                z-index: 99;
+            }
+
+            .sidebar .logo {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左侧/底部导航栏 -->
+    <div class="sidebar">
+        <div class="logo">❤️</div>
+        <div class="nav-item" onclick="window.location.href='index.html'">🏠</div>
+        <div class="nav-item" data-page="say">💬</div>
+        <div class="nav-item active" data-page="record">📖</div>
+        <div class="nav-item" data-page="album">🖼️</div>
+        <div class="nav-item">📊</div>
+    </div>
+
+    <!-- 顶部搜索栏（PC端） -->
+    <style>
+        .top-bar {
+            justify-content: space-between;
+        }
+        .search-box {
+            /* 移除默认的search-box样式，让其在下拉菜单中自适应 */
+            /* width: 300px; */
+        }
+        .love-item.editing .love-text {
+            border: 1px dashed #ccc;
+            padding: 4px;
+            outline: none;
+        }
+        .delete-thing-btn {
+            margin-left: auto;
+            color: red;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
+    
+    <div class="top-bar">
+        <!-- 搜索框并入菜单栏，这里默认隐藏，或只留标题 -->
+        <div style="font-weight: 600; font-size: 18px;">恋爱100件小事</div>
+        <div class="menu-btn" id="menuBtn">☰</div>
+        
+        <!-- 下拉菜单（搜索+管理） -->
+        <div class="dropdown-menu" id="dropdownMenu" style="display:none; position:absolute; top:60px; right:40px; background:#fff; border:1px solid #eee; padding:15px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:250px; flex-direction:column; gap:10px; z-index:100;">
+            <div class="search-box" style="width:100%;">
+                <span>🔍</span>
+                <input type="text" id="searchThing" placeholder="搜索恋爱小事...">
+            </div>
+            <div id="adminTools" style="display:none; flex-direction:column; gap:10px; margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
+                <button id="addThingBtn" style="padding:8px; background:#f56f7c; color:white; border:none; border-radius:4px; cursor:pointer;">➕ 添加小事</button>
+                <button id="editModeBtn" style="padding:8px; background:#f5f5f5; color:#333; border:none; border-radius:4px; cursor:pointer;">✏️ 编辑模式</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区：恋爱100件小事（可直接修改内容） -->
+    <div class="main-content">
+        <h1 class="page-title">恋爱100件小事</h1>
+        <div class="love-list" id="loveList">
+            <!-- 示例：复制此块添加/修改小事 -->
+            <div class="love-item">
+                <div class="check-circle"></div>
+                <div class="love-text">一起去看一场浪漫的烟花秀</div>
+            </div>
+            <div class="love-item">
+                <div class="check-circle"></div>
+                <div class="love-text">手牵手压一次马路，从黄昏走到夜晚</div>
+            </div>
+            <div class="love-item">
+                <div class="check-circle"></div>
+                <div class="love-text">一起做一顿丰盛的晚餐，哪怕手忙脚乱</div>
+            </div>
+            <div class="love-item">
+                <div class="check-circle"></div>
+                <div class="love-text">去海边看一次日出，迎接第一缕阳光</div>
+            </div>
+            <div class="love-item">
+                <div class="check-circle"></div>
+                <div class="love-text">互相为对方写一封手写的情书</div>
+            </div>
+            <div class="love-item">
+                <div class="check-circle"></div>
+                <div class="love-text">一起去游乐园，坐旋转木马和过山车</div>
+            </div>
+            <div class="love-item">
+                <div class="check-circle"></div>
+                <div class="love-text">窝在沙发上看一部甜甜的爱情电影</div>
+            </div>
+            <div class="love-item">
+                <div class="check-circle"></div>
+                <div class="love-text">一起去旅行，去一个彼此都想去的地方</div>
+            </div>
+            <div class="love-item">
+                <div class="check-circle"></div>
+                <div class="love-text">为对方洗一次头发，温柔地吹干</div>
+            </div>
+            <div class="love-item">
+                <div class="check-circle"></div>
+                <div class="love-text">一起养一盆小植物，见证它的生长</div>
+            </div>
+            <!-- 继续添加剩下的小事 -->
+        </div>
+    </div>
+
+    <!-- 右侧个人栏（仅PC端显示） -->
+    <div class="aside">
+        <div class="profile-card">
+            <div class="profile-avatars">
+                <div class="profile-avatar">
+                    <img src="img/男生头像.jpg" alt="男生头像">
+                </div>
+                <div class="profile-avatar">
+                    <img src="img/女生头像.jpg" alt="女生头像">
+                </div>
+            </div>
+            <div class="profile-name">主页</div>
+            <div class="profile-bio">欢迎收看我们的恋爱频道 ♡̷</div>
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="recordCount">0</div>
+                    <div class="stat-label">点滴</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="albumCount">0</div>
+                    <div class="stat-label">照片</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="loveDays">0</div>
+                    <div class="stat-label">相恋天</div>
+                </div>
+            </div>
+        </div>
+        <div class="social-card">
+            <div class="social-title">主页 Homepage</div>
+            <div class="social-item">🌹</div>
+        </div>
+        <div class="copyright">
+            Copyright © 2024 - 2026 我们的小窝
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
+    <script src="cos-utils.js"></script>
+    <script>
+        // 恋爱开始日期（和主页保持一致）
+        const LOVE_START_DATE = new Date(2022, 4, 11);
+
+        const searchThing = document.getElementById('searchThing');
+        const loveList = document.getElementById('loveList');
+        const menuBtn = document.getElementById('menuBtn');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const adminTools = document.getElementById('adminTools');
+        const addThingBtn = document.getElementById('addThingBtn');
+        const editModeBtn = document.getElementById('editModeBtn');
+
+        // 默认数据
+        const DEFAULT_THINGS = [
+            "一起去看一场浪漫的烟花秀",
+            "手牵手压一次马路，从黄昏走到夜晚",
+            "一起做一顿丰盛的晚餐，哪怕手忙脚乱",
+            "去海边看一次日出，迎接第一缕阳光",
+            "互相为对方写一封手写的情书",
+            "一起去游乐园，坐旋转木马和过山车",
+            "窝在沙发上看一部甜甜的爱情电影",
+            "一起去旅行，去一个彼此都想去的地方",
+            "为对方洗一次头发，温柔地吹干",
+            "一起养一盆小植物，见证它的生长"
+        ];
+
+        // 获取小事列表
+        async function getThings() {
+            const things = await API.getData('things.json', []);
+            if (things.length === 0) {
+                // 如果云端没有数据，使用默认数据并上传
+                const defaultThings = DEFAULT_THINGS.map(t => ({ text: t, checked: false }));
+                await API.saveData('things.json', defaultThings);
+                return defaultThings;
+            }
+            return things;
+        }
+
+        // 渲染列表
+        async function renderThings(filter = '') {
+            const things = await getThings();
+            loveList.innerHTML = '';
+            
+            things.forEach((thing, index) => {
+                if (filter && !thing.text.includes(filter)) return;
+
+                const div = document.createElement('div');
+                div.className = 'love-item';
+                div.innerHTML = `
+                    <div class="check-circle ${thing.checked ? 'checked' : ''}" onclick="toggleCheck(${index})"></div>
+                    <div class="love-text" contenteditable="false" onblur="updateText(${index}, this.innerText)">${thing.text}</div>
+                    <div class="delete-thing-btn" onclick="deleteThing(${index})">🗑️</div>
+                `;
+                loveList.appendChild(div);
+            });
+            updateLoveDays(); // 更新计数
+        }
+
+        // 勾选/取消
+        window.toggleCheck = async function(index) {
+            const role = localStorage.getItem('role');
+            if (role !== 'admin') {
+                alert('只有管理员可以打卡哦~');
+                return;
+            }
+            const things = await getThings();
+            things[index].checked = !things[index].checked;
+            await API.saveData('things.json', things);
+            renderThings(searchThing.value.trim());
+        };
+
+        // 更新文字
+        window.updateText = async function(index, newText) {
+            const things = await getThings();
+            things[index].text = newText;
+            await API.saveData('things.json', things);
+        };
+
+        // 删除小事
+        window.deleteThing = async function(index) {
+            if(!confirm('确定删除这件事吗？')) return;
+            const things = await getThings();
+            things.splice(index, 1);
+            await API.saveData('things.json', things);
+            renderThings(searchThing.value.trim());
+        };
+
+        // 搜索功能
+        searchThing.addEventListener('input', function() {
+            renderThings(this.value.trim());
+        });
+
+        // 菜单显示/隐藏
+        menuBtn.addEventListener('click', () => {
+            if(dropdownMenu.style.display === 'none') {
+                dropdownMenu.style.display = 'flex';
+                // 检查权限显示工具
+                if(localStorage.getItem('role') === 'admin') {
+                    adminTools.style.display = 'flex';
+                }
+            } else {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+
+        // 添加小事
+        addThingBtn.addEventListener('click', async () => {
+            const text = prompt('请输入新的恋爱小事：');
+            if(text) {
+                const things = await getThings();
+                things.push({ text: text, checked: false });
+                await API.saveData('things.json', things);
+                renderThings();
+            }
+        });
+
+        // 编辑模式切换
+        let isEditMode = false;
+        editModeBtn.addEventListener('click', () => {
+            isEditMode = !isEditMode;
+            editModeBtn.textContent = isEditMode ? '✅ 完成编辑' : '✏️ 编辑模式';
+            
+            document.querySelectorAll('.love-text').forEach(el => {
+                el.contentEditable = isEditMode;
+                if(isEditMode) el.classList.add('editing');
+                else el.classList.remove('editing');
+            });
+            
+            document.querySelectorAll('.delete-thing-btn').forEach(el => {
+                el.style.display = isEditMode ? 'block' : 'none';
+            });
+        });
+
+        // 导航跳转逻辑
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const page = this.dataset.page;
+                if (page === 'say') window.location.href = 'say.html';
+                else if (page === 'home') window.location.href = 'index.html';
+                else if (page === 'album') window.location.href = 'album.html';
+            });
+        });
+
+        // 更新恋爱天数
+        function updateLoveDays() {
+            const now = new Date();
+            const diff = now - LOVE_START_DATE;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('loveDays').textContent = days;
+        }
+
+        // 更新相册数量
+        async function updateAlbumCount() {
+            const albums = await API.getData('albums.json', []);
+            document.getElementById('albumCount').textContent = albums.length;
+        }
+
+        // 更新说说数量
+        async function updateRecordCount() {
+            const says = await API.getData('says.json', []);
+            document.getElementById('recordCount').textContent = says.length;
+        }
+
+        // 初始化
+        window.onload = function () {
+            // 检查是否登录（兼容 session 和 local）
+            if (!localStorage.getItem('isLoggedIn') && !sessionStorage.getItem('isLoggedIn')) {
+                window.location.replace('login.html');
+                return;
+            }
+
+            renderThings();
+            updateAlbumCount();
+            updateRecordCount();
+        };
+    </script>
+</body>
+</html>
