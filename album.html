@@ -331,6 +331,21 @@
         <div id="modalCaption" style="color: white; font-size: 16px; text-align: center; max-width: 80%;"></div>
     </div>
 
+    <!-- 上传加载模态框 -->
+    <div id="uploadModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:12px; text-align:center; min-width:280px; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+            <div id="loadingSpinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #f56f7c; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+            <div id="uploadStatusText" style="margin-bottom: 20px; font-size: 16px; color: #333;">正在上传...</div>
+            <div id="uploadProgress" style="margin-bottom: 20px; font-size: 14px; color: #666;"></div>
+            <button id="closeUploadBtn" style="display:none; padding:8px 24px; background:#f56f7c; color:white; border:none; border-radius:4px; cursor:pointer; font-size:14px; margin:0 auto;">确认</button>
+            <button id="cancelUploadBtn" style="display:block; padding:8px 24px; background:#f5f5f5; color:#666; border:1px solid #ddd; border-radius:4px; cursor:pointer; font-size:14px; margin:0 auto;">取消</button>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+
     <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
     <script src="cos-utils.js"></script>
     <script>
@@ -450,35 +465,85 @@
         //     uploadBtn.addEventListener('click', () => { ... });
         // }
 
+        const uploadModal = document.getElementById('uploadModal');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const uploadStatusText = document.getElementById('uploadStatusText');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const closeUploadBtn = document.getElementById('closeUploadBtn');
+        const cancelUploadBtn = document.getElementById('cancelUploadBtn');
+        
+        let isUploading = false;
+        let shouldCancel = false;
+
+        cancelUploadBtn.addEventListener('click', () => {
+            if (isUploading) {
+                if(confirm('确定要取消上传吗？')) {
+                    shouldCancel = true;
+                    uploadStatusText.textContent = '正在取消...';
+                }
+            } else {
+                uploadModal.style.display = 'none';
+            }
+        });
+
+        closeUploadBtn.addEventListener('click', () => {
+            uploadModal.style.display = 'none';
+            renderAlbums();
+        });
+
         fileInput.addEventListener('change', async (e) => {
             const files = e.target.files;
             if (!files || files.length === 0) return;
 
-            // 询问备注（批量上传时，这个备注会应用到所有选中的图片，或者我们可以简化为一张一张传）
-            // 为了简单易用，这里假设用户想给这一批照片加统一备注，或者不加
+            // 询问备注
             const caption = prompt('请输入照片备注（可选）：');
 
-            // 显示上传中
-            const originalText = document.querySelector('.upload-text').textContent;
-            document.querySelector('.upload-text').textContent = '上传中...';
+            // 初始化弹窗状态
+            uploadModal.style.display = 'flex';
+            loadingSpinner.style.display = 'block';
+            uploadStatusText.textContent = '正在准备上传...';
+            uploadProgress.textContent = `0 / ${files.length}`;
+            closeUploadBtn.style.display = 'none';
+            cancelUploadBtn.style.display = 'block';
+            cancelUploadBtn.textContent = '取消';
+            
+            isUploading = true;
+            shouldCancel = false;
 
             const albums = await getAlbums();
+            let successCount = 0;
             
             for (let i = 0; i < files.length; i++) {
+                if (shouldCancel) break;
+
+                uploadStatusText.textContent = `正在上传第 ${i+1} 张...`;
+                
                 try {
+                    // 传递自定义配置：允许大文件
+                    // 注意：cos-utils.js 需要支持 file.size 检查的跳过
                     const url = await API.uploadFile(files[i], 'photos/');
-                    // 保存对象结构：{ url: '...', caption: '...' }
                     albums.push({ url: url, caption: caption || '' });
+                    successCount++;
                 } catch (err) {
                     console.error('上传失败', err);
                 }
+                
+                uploadProgress.textContent = `${successCount} / ${files.length}`;
             }
 
             await API.saveData('albums.json', albums);
-            renderAlbums();
             
-            alert('上传操作完成');
-            document.querySelector('.upload-text').textContent = originalText;
+            // 上传结束状态
+            isUploading = false;
+            loadingSpinner.style.display = 'none';
+            if (shouldCancel) {
+                uploadStatusText.textContent = '上传已取消';
+            } else {
+                uploadStatusText.textContent = '上传完成！';
+            }
+            
+            cancelUploadBtn.style.display = 'none';
+            closeUploadBtn.style.display = 'block';
             fileInput.value = ''; 
         });
 
