@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恋爱基金 - 我们的小窝</title>
+    <style>
+        /* 全局重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            min-height: 100vh;
+            padding-bottom: 0;
+        }
+
+        /* 左侧导航栏（PC端样式） */
+        .sidebar {
+            width: 100px;
+            background-color: #ffffff;
+            border-right: 1px solid #f0f0f0;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            position: fixed;
+            height: 100vh;
+            z-index: 99;
+        }
+
+        .sidebar .logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sidebar .nav-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 20px;
+            position: relative;
+        }
+
+        .sidebar .nav-item.active {
+            background-color: #f56f7c;
+            color: #ffffff;
+        }
+
+        .sidebar .nav-item:hover:not(.active) {
+            background-color: #fff0f2;
+        }
+
+        /* 顶部栏 */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 100px;
+            right: 0;
+            height: 60px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 10;
+            justify-content: space-between;
+        }
+
+        .page-title-header {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .menu-btn {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .menu-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            margin-left: 100px;
+            margin-top: 60px;
+            padding: 40px;
+            max-width: 900px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: #999999;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* 基金卡片 */
+        .fund-card {
+            background: linear-gradient(135deg, #f56f7c 0%, #ff8595 100%);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(245, 111, 124, 0.2);
+        }
+
+        .fund-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .fund-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .fund-icon {
+            font-size: 28px;
+        }
+
+        .fund-balance {
+            margin-bottom: 20px;
+        }
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .balance-amount {
+            font-size: 48px;
+            font-weight: 700;
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+
+        .balance-amount small {
+            font-size: 18px;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        .fund-progress {
+            margin-bottom: 20px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: white;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .fund-target {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+        }
+
+        /* 操作按钮 */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn.primary {
+            background-color: #f56f7c;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background-color: #ff8595;
+        }
+
+        .action-btn.secondary {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background-color: #eaeaea;
+        }
+
+        /* 记录列表 */
+        .records-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .records-list {
+            background-color: #fafafa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .record-item:last-child {
+            border-bottom: none;
+        }
+
+        .record-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .record-icon {
+            width: 36px;
+            height: 36px;
+            background-color: #fff0f2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f56f7c;
+        }
+
+        .record-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .record-desc {
+            font-weight: 500;
+        }
+
+        .record-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .record-amount {
+            font-weight: 600;
+        }
+
+        .record-amount.income {
+            color: #f56f7c;
+        }
+
+        .record-amount.expense {
+            color: #666;
+        }
+
+        .no-records {
+            text-align: center;
+            color: #999;
+            padding: 40px 0;
+        }
+
+        /* 管理员提示 */
+        .admin-tip {
+            background-color: #fff0f2;
+            border-left: 4px solid #f56f7c;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .form-group input, .form-group select {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #f56f7c;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .modal-btn.primary {
+            background-color: #f56f7c;
+            color: white;
+        }
+
+        .modal-btn.primary:hover {
+            background-color: #ff8595;
+        }
+
+        .modal-btn.secondary {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+
+        .modal-btn.secondary:hover {
+            background-color: #eaeaea;
+        }
+
+        /* 右侧个人栏 */
+        .aside {
+            width: 300px;
+            padding: 40px 20px;
+            border-left: 1px solid #f0f0f0;
+            margin-top: 60px;
+        }
+
+        .profile-card {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatars {
+            display: flex;
+            justify-content: center;
+            gap: -15px;
+            margin-bottom: 15px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            overflow: hidden;
+            border: 3px solid #ffffff;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-bio {
+            color: #999999;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .stat-label {
+            color: #999999;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .social-card {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .social-title {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 10px;
+        }
+
+        .social-item {
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .copyright {
+            color: #999999;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* 移动端响应式 */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                padding-bottom: 80px;
+            }
+
+            .aside {
+                display: none !important;
+            }
+
+            .top-bar {
+                left: 0;
+                width: 100%;
+                padding: 10px 20px;
+                height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+                margin-top: 60px;
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 15px 0;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                top: auto;
+                border-right: none;
+                border-top: 1px solid #f0f0f0;
+                gap: 0;
+                background-color: #ffffff;
+                z-index: 99;
+            }
+
+            .sidebar .logo {
+                display: none;
+            }
+
+            .fund-card {
+                padding: 20px;
+            }
+
+            .balance-amount {
+                font-size: 36px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左侧/底部导航栏（6个图标：首页、说说、小事、相册、基金） -->
+    <div class="sidebar">
+        <div class="logo">❤️</div>
+        <div class="nav-item" data-page="home">🏠</div>          <!-- 首页 -->
+        <div class="nav-item" data-page="say">💬</div>           <!-- 说说 -->
+        <div class="nav-item" data-page="record">📖</div>        <!-- 小事 -->
+        <div class="nav-item" data-page="album">🖼️</div>         <!-- 相册 -->
+        <div class="nav-item" data-page="fund">💰</div>          <!-- 基金 -->
+    </div>
+
+    <!-- 顶部栏 -->
+    <div class="top-bar">
+        <div class="page-title-header">恋爱基金</div>
+        <div class="menu-btn" id="menuBtn">☰</div>
+        
+        <!-- 下拉菜单（仅管理员可见） -->
+        <div class="dropdown-menu" id="dropdownMenu" style="display:none; position:absolute; top:60px; right:40px; background:#fff; border:1px solid #eee; padding:15px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:250px; flex-direction:column; gap:10px; z-index:100;">
+            <div style="padding:8px; background:#f5f5f5; border-radius:4px; text-align:center; color:#666;">
+                <span id="adminRole">👑 管理员模式</span>
+            </div>
+            <button id="setTargetBtn" style="padding:8px; background:#f56f7c; color:white; border:none; border-radius:4px; cursor:pointer;">🎯 设置目标金额</button>
+            <button id="resetFundBtn" style="padding:8px; background:#f5f5f5; color:#333; border:none; border-radius:4px; cursor:pointer;">🔄 重置基金</button>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <h1 class="page-title">恋爱基金</h1>
+        <p class="page-subtitle">一起为我们的未来存钱吧 💰</p>
+
+        <!-- 管理员提示（仅访客可见） -->
+        <div class="admin-tip" id="guestTip" style="display: none;">
+            💡 只有管理员可以查看和操作基金详情哦～
+        </div>
+
+        <!-- 基金卡片 -->
+        <div class="fund-card" id="fundCard">
+            <div class="fund-header">
+                <span class="fund-icon">💰</span>
+                <h2>恋爱小荷包</h2>
+            </div>
+            <div class="fund-balance">
+                <div class="balance-label">当前余额</div>
+                <div class="balance-amount">
+                    ¥<span id="currentBalance">0.00</span>
+                    <small>CNY</small>
+                </div>
+            </div>
+            <div class="fund-progress">
+                <div class="progress-header">
+                    <span>目标进度</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="fund-target">
+                <span>目标金额</span>
+                <span>¥<span id="targetAmount">0.00</span></span>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+            <button class="action-btn primary" id="addIncomeBtn">➕ 存入</button>
+            <button class="action-btn secondary" id="addExpenseBtn">➖ 支出</button>
+        </div>
+
+        <!-- 记录列表 -->
+        <div class="records-section" id="recordsSection" style="display: none;">
+            <h3 class="records-title">最近记录</h3>
+            <div class="records-list" id="recordsList">
+                <div class="no-records">暂无记录</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧个人栏 -->
+    <div class="aside">
+        <div class="profile-card">
+            <div class="profile-avatars">
+                <div class="profile-avatar">
+                    <img src="img/男生头像.jpg" alt="男生头像">
+                </div>
+                <div class="profile-avatar">
+                    <img src="img/女生头像.jpg" alt="女生头像">
+                </div>
+            </div>
+            <div class="profile-name">主页</div>
+            <div class="profile-bio">欢迎收看我们的恋爱频道 ♡̷</div>
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="recordCount">0</div>
+                    <div class="stat-label">点滴</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="albumCount">0</div>
+                    <div class="stat-label">照片</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="loveDays">0</div>
+                    <div class="stat-label">相恋天</div>
+                </div>
+            </div>
+        </div>
+        <div class="social-card">
+            <div class="social-title">主页 Homepage</div>
+            <div class="social-item">🌹</div>
+        </div>
+        <div class="copyright">
+            Copyright © 2024 - 2026 我们的小窝
+        </div>
+    </div>
+
+    <!-- 存入模态框 -->
+    <div class="modal" id="incomeModal">
+        <div class="modal-content">
+            <h3 class="modal-title">存入金额</h3>
+            <div class="modal-form">
+                <div class="form-group">
+                    <label>金额（元）</label>
+                    <input type="number" id="incomeAmount" placeholder="输入金额" step="0.01" min="0.01">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <input type="text" id="incomeDesc" placeholder="例如：工资、红包...">
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn secondary" onclick="closeIncomeModal()">取消</button>
+                    <button class="modal-btn primary" onclick="addIncome()">确认存入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 支出模态框 -->
+    <div class="modal" id="expenseModal">
+        <div class="modal-content">
+            <h3 class="modal-title">支出金额</h3>
+            <div class="modal-form">
+                <div class="form-group">
+                    <label>金额（元）</label>
+                    <input type="number" id="expenseAmount" placeholder="输入金额" step="0.01" min="0.01">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <input type="text" id="expenseDesc" placeholder="例如：吃饭、看电影...">
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn secondary" onclick="closeExpenseModal()">取消</button>
+                    <button class="modal-btn primary" onclick="addExpense()">确认支出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置目标模态框 -->
+    <div class="modal" id="targetModal">
+        <div class="modal-content">
+            <h3 class="modal-title">设置目标金额</h3>
+            <div class="modal-form">
+                <div class="form-group">
+                    <label>目标金额（元）</label>
+                    <input type="number" id="targetAmountInput" placeholder="输入目标金额" step="100" min="0">
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn secondary" onclick="closeTargetModal()">取消</button>
+                    <button class="modal-btn primary" onclick="setTarget()">确认设置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
+    <script src="cos-utils.js"></script>
+    <script>
+        // 恋爱开始日期
+        const LOVE_START_DATE = new Date(2022, 4, 11);
+
+        // 获取当前角色
+        const role = localStorage.getItem('role');
+        const isAdmin = role === 'admin';
+
+        // DOM 元素
+        const menuBtn = document.getElementById('menuBtn');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const guestTip = document.getElementById('guestTip');
+        const actionButtons = document.getElementById('actionButtons');
+        const recordsSection = document.getElementById('recordsSection');
+        const currentBalance = document.getElementById('currentBalance');
+        const targetAmount = document.getElementById('targetAmount');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+
+        // 模态框
+        const incomeModal = document.getElementById('incomeModal');
+        const expenseModal = document.getElementById('expenseModal');
+        const targetModal = document.getElementById('targetModal');
+
+        // 初始化数据
+        let fundData = {
+            balance: 0,
+            target: 0,
+            records: []
+        };
+
+        // 检查权限
+        if (!isAdmin) {
+            // 访客模式：隐藏操作按钮，显示提示
+            guestTip.style.display = 'block';
+            actionButtons.style.display = 'none';
+            recordsSection.style.display = 'none';
+        } else {
+            // 管理员模式：显示操作按钮
+            actionButtons.style.display = 'flex';
+            recordsSection.style.display = 'block';
+        }
+
+        // 菜单按钮点击
+        menuBtn.addEventListener('click', () => {
+            if (!isAdmin) {
+                alert('只有管理员可以操作哦~');
+                return;
+            }
+            dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'flex' : 'none';
+        });
+
+        // 关闭下拉菜单（点击其他地方）
+        document.addEventListener('click', (e) => {
+            if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+
+        // 加载基金数据
+        async function loadFundData() {
+            fundData = await API.getData('fund.json', {
+                balance: 0,
+                target: 0,
+                records: []
+            });
+            
+            // 更新显示
+            currentBalance.textContent = fundData.balance.toFixed(2);
+            targetAmount.textContent = fundData.target.toFixed(2);
+            
+            // 更新进度条
+            if (fundData.target > 0) {
+                const percent = Math.min((fundData.balance / fundData.target) * 100, 100);
+                progressFill.style.width = percent + '%';
+                progressPercent.textContent = percent.toFixed(1) + '%';
+            } else {
+                progressFill.style.width = '0%';
+                progressPercent.textContent = '0%';
+            }
+
+            // 渲染记录
+            renderRecords();
+        }
+
+        // 保存基金数据
+        async function saveFundData() {
+            await API.saveData('fund.json', fundData);
+            await loadFundData(); // 重新加载更新显示
+        }
+
+        // 渲染记录
+        function renderRecords() {
+            if (!isAdmin) return;
+
+            const recordsList = document.getElementById('recordsList');
+            
+            if (fundData.records.length === 0) {
+                recordsList.innerHTML = '<div class="no-records">暂无记录</div>';
+                return;
+            }
+
+            // 倒序显示最新的
+            const sortedRecords = [...fundData.records].reverse();
+
+            recordsList.innerHTML = sortedRecords.map(record => {
+                const isIncome = record.type === 'income';
+                return `
+                    <div class="record-item">
+                        <div class="record-info">
+                            <div class="record-icon">${isIncome ? '💰' : '💸'}</div>
+                            <div class="record-detail">
+                                <div class="record-desc">${record.desc || (isIncome ? '存入' : '支出')}</div>
+                                <div class="record-time">${record.time}</div>
+                            </div>
+                        </div>
+                        <div class="record-amount ${isIncome ? 'income' : 'expense'}">
+                            ${isIncome ? '+' : '-'}¥${record.amount.toFixed(2)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 打开存入模态框
+        window.openIncomeModal = function() {
+            if (!isAdmin) return;
+            incomeModal.style.display = 'flex';
+        };
+
+        // 关闭存入模态框
+        window.closeIncomeModal = function() {
+            incomeModal.style.display = 'none';
+            document.getElementById('incomeAmount').value = '';
+            document.getElementById('incomeDesc').value = '';
+        };
+
+        // 存入
+        window.addIncome = async function() {
+            const amount = parseFloat(document.getElementById('incomeAmount').value);
+            const desc = document.getElementById('incomeDesc').value.trim();
+
+            if (!amount || amount <= 0) {
+                alert('请输入有效的金额');
+                return;
+            }
+
+            const now = new Date();
+            const time = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+            fundData.balance += amount;
+            fundData.records.push({
+                type: 'income',
+                amount: amount,
+                desc: desc || '存入',
+                time: time
+            });
+
+            await saveFundData();
+            closeIncomeModal();
+        };
+
+        // 打开支出模态框
+        window.openExpenseModal = function() {
+            if (!isAdmin) return;
+            expenseModal.style.display = 'flex';
+        };
+
+        // 关闭支出模态框
+        window.closeExpenseModal = function() {
+            expenseModal.style.display = 'none';
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseDesc').value = '';
+        };
+
+        // 支出
+        window.addExpense = async function() {
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const desc = document.getElementById('expenseDesc').value.trim();
+
+            if (!amount || amount <= 0) {
+                alert('请输入有效的金额');
+                return;
+            }
+
+            if (amount > fundData.balance) {
+                alert('余额不足');
+                return;
+            }
+
+            const now = new Date();
+            const time = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+            fundData.balance -= amount;
+            fundData.records.push({
+                type: 'expense',
+                amount: amount,
+                desc: desc || '支出',
+                time: time
+            });
+
+            await saveFundData();
+            closeExpenseModal();
+        };
+
+        // 打开目标模态框
+        document.getElementById('setTargetBtn').addEventListener('click', function() {
+            if (!isAdmin) return;
+            document.getElementById('targetAmountInput').value = fundData.target;
+            targetModal.style.display = 'flex';
+            dropdownMenu.style.display = 'none';
+        });
+
+        // 关闭目标模态框
+        window.closeTargetModal = function() {
+            targetModal.style.display = 'none';
+        };
+
+        // 设置目标
+        window.setTarget = async function() {
+            const target = parseFloat(document.getElementById('targetAmountInput').value);
+            
+            if (!target || target < 0) {
+                alert('请输入有效的目标金额');
+                return;
+            }
+
+            fundData.target = target;
+            await saveFundData();
+            closeTargetModal();
+        };
+
+        // 重置基金
+        document.getElementById('resetFundBtn').addEventListener('click', async function() {
+            if (!isAdmin) return;
+            
+            if (confirm('确定要重置基金吗？所有记录将被清空。')) {
+                fundData = {
+                    balance: 0,
+                    target: 0,
+                    records: []
+                };
+                await saveFundData();
+                dropdownMenu.style.display = 'none';
+            }
+        });
+
+        // 导航跳转
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const page = this.dataset.page;
+                if (page === 'home') window.location.href = 'index.html';
+                else if (page === 'say') window.location.href = 'say.html';
+                else if (page === 'record') window.location.href = 'record.html';
+                else if (page === 'album') window.location.href = 'album.html';
+                else if (page === 'fund') {
+                    // 基金页面权限检查
+                    if (!isAdmin) {
+                        alert('只有管理员可以查看基金页面');
+                        return;
+                    }
+                    window.location.href = 'fund.html';
+                }
+            });
+        });
+
+        // 更新恋爱天数
+        function updateLoveDays() {
+            const now = new Date();
+            const diff = now - LOVE_START_DATE;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('loveDays').textContent = days;
+        }
+
+        // 更新相册数量
+        async function updateAlbumCount() {
+            const albums = await API.getData('albums.json', []);
+            document.getElementById('albumCount').textContent = albums.length;
+        }
+
+        // 更新说说数量
+        async function updateRecordCount() {
+            const says = await API.getData('says.json', []);
+            document.getElementById('recordCount').textContent = says.length;
+        }
+
+        // 为操作按钮添加事件
+        document.getElementById('addIncomeBtn').addEventListener('click', openIncomeModal);
+        document.getElementById('addExpenseBtn').addEventListener('click', openExpenseModal);
+
+        // 初始化
+        window.onload = async function() {
+            // 检查是否登录
+            if (!localStorage.getItem('isLoggedIn') && !sessionStorage.getItem('isLoggedIn')) {
+                window.location.replace('login.html');
+                return;
+            }
+
+            // 如果是访客访问基金页面，跳转到首页
+            if (!isAdmin && window.location.pathname.includes('fund.html')) {
+                alert('只有管理员可以查看基金页面');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            await loadFundData();
+            updateLoveDays();
+            updateAlbumCount();
+            updateRecordCount();
+        };
+    </script>
+</body>
+</html>
